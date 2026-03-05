@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>DriveFlow CRM — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #0D9488; --teal-light: #CCFBF1; --teal-dark: #0F766E;
+    --navy: #0F172A; --navy2: #1E293B; --navy3: #334155;
+    --gray: #64748B; --gray2: #94A3B8; --gray3: #CBD5E1;
+    --bg: #F8FAFC; --white: #FFFFFF;
+    --blue: #3B82F6; --amber: #F59E0B; --green: #10B981; --purple: #8B5CF6; --rose: #F43F5E;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  html, body { width: 1440px; height: 900px; overflow: hidden; background: var(--bg); font-family: var(--font); }
+  .app { display: flex; height: 900px; }
+
+  /* SIDEBAR */
+  .sidebar { width: 220px; min-width: 220px; height: 900px; background: var(--navy); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  .sidebar::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; border-radius: 50%; background: var(--teal); opacity: 0.07; }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .logo-mark { display: flex; align-items: center; gap: 9px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; fill: white; }
+  .logo-text { font-size: 15px; font-weight: 700; color: white; }
+  .logo-sub { font-size: 10px; color: var(--gray2); margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .nav { padding: 16px 12px; flex: 1; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--gray2); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13.5px; font-weight: 500; color: var(--gray2); margin-bottom: 2px; }
+  .nav-item.active { background: var(--teal); color: white; }
+  .nav-item svg { width: 16px; height: 16px; opacity: 0.8; }
+  .sidebar-bottom { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .user-card { display: flex; align-items: center; gap: 10px; padding: 8px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #8B5CF6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+  .user-name { font-size: 13px; font-weight: 600; color: white; }
+  .user-role { font-size: 11px; color: var(--gray2); }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 58px; background: white; border-bottom: 1px solid var(--gray3); display: flex; align-items: center; padding: 0 28px; gap: 12px; flex-shrink: 0; }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--navy2); flex: 1; }
+  .date-select { height: 34px; border: 1.5px solid var(--gray3); border-radius: 8px; padding: 0 28px 0 10px; font-family: var(--font); font-size: 12.5px; color: var(--navy2); background: white; appearance: none; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+  .export-btn { display: flex; align-items: center; gap: 7px; border: 1.5px solid var(--gray3); background: white; padding: 7px 14px; border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--navy3); cursor: pointer; }
+  .notif-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--gray3); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray); position: relative; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--rose); border-radius: 50%; border: 1.5px solid white; }
+
+  .content { flex: 1; padding: 18px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+  /* METRIC CARDS */
+  .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .metric-card { background: white; border: 1.5px solid var(--gray3); border-radius: 12px; padding: 18px 20px; position: relative; overflow: hidden; }
+  .metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+  .mc-teal::before { background: var(--teal); }
+  .mc-blue::before { background: var(--blue); }
+  .mc-green::before { background: var(--green); }
+  .mc-amber::before { background: var(--amber); }
+
+  .metric-label { font-size: 11px; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .metric-value { font-size: 36px; font-weight: 800; color: var(--navy2); letter-spacing: -1.5px; line-height: 1; margin-bottom: 6px; }
+  .metric-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .trend-up { color: var(--green); }
+  .trend-down { color: var(--rose); }
+  .trend-neutral { color: var(--gray2); }
+
+  /* CHARTS ROW */
+  .charts-row { display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px; }
+  .chart-card { background: white; border: 1.5px solid var(--gray3); border-radius: 12px; padding: 18px 20px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--navy2); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .card-title-sub { font-size: 11.5px; color: var(--gray2); font-weight: 500; }
+
+  /* DONUT CHART (CSS) */
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut { position: relative; width: 110px; height: 110px; }
+  .donut svg { transform: rotate(-90deg); }
+  .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .donut-total { font-size: 22px; font-weight: 800; color: var(--navy2); line-height: 1; }
+  .donut-label { font-size: 10px; color: var(--gray2); font-weight: 600; }
+
+  .legend { display: flex; flex-direction: column; gap: 7px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: var(--navy2); font-weight: 500; flex: 1; }
+  .legend-pct { color: var(--gray); font-weight: 700; font-size: 12px; }
+
+  /* FUNNEL CHART (CSS bars) */
+  .funnel-rows { display: flex; flex-direction: column; gap: 8px; }
+  .funnel-row { display: flex; align-items: center; gap: 10px; }
+  .funnel-stage { font-size: 12px; color: var(--gray); width: 110px; text-align: right; flex-shrink: 0; font-weight: 500; }
+  .funnel-bar-wrap { flex: 1; height: 20px; background: var(--bg); border-radius: 4px; overflow: hidden; position: relative; }
+  .funnel-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-right: 6px; justify-content: flex-end; }
+  .funnel-num { font-size: 11.5px; font-weight: 700; color: white; }
+
+  /* TABLES ROW */
+  .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .table-card { background: white; border: 1.5px solid var(--gray3); border-radius: 12px; padding: 18px 20px; }
+
+  .data-table { width: 100%; }
+  .data-table th { font-size: 11px; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 0 8px; border-bottom: 1.5px solid var(--bg); text-align: left; }
+  .data-table td { padding: 8px 0; border-bottom: 1px solid var(--bg); font-size: 13px; color: var(--navy2); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .rank { font-weight: 800; color: var(--teal); }
+  .pct-bar { display: flex; align-items: center; gap: 6px; }
+  .pct-track { width: 60px; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .pct-fill { height: 100%; border-radius: 3px; background: var(--teal); }
+
+  /* Model bars */
+  .model-bar-wrap { flex: 1; height: 14px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .model-bar { height: 100%; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div><div class="logo-text">DriveFlow</div><div class="logo-sub">CRM</div></div></div></div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="8" width="5" height="13"/><rect x="17" y="5" width="5" height="16"/></svg>Pipeline</div>
+      <div class="nav-label">Analytics</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Reports</div>
+      <div class="nav-label">System</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</div>
+    </nav>
+    <div class="sidebar-bottom"><div class="user-card"><div class="avatar">SM</div><div><div class="user-name">Sunita Mishra</div><div class="user-role">Business Manager</div></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">Analytics Dashboard</div>
+      <select class="date-select">
+        <option selected>Last 30 days</option>
+        <option>Last 7 days</option>
+        <option>This Month</option>
+        <option>Last Quarter</option>
+        <option>Custom range…</option>
+      </select>
+      <button class="export-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export Report
+      </button>
+      <div class="notif-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border:1.5px solid #CBD5E1;border-radius:8px;">
+        <div class="avatar" style="width:26px;height:26px;font-size:10px;background:#8B5CF6;">SM</div>
+        <span style="font-size:13px;font-weight:600;color:#1E293B;">Sunita M.</span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- METRIC CARDS -->
+      <div class="metric-row">
+        <div class="metric-card mc-teal">
+          <div class="metric-label">Total Leads</div>
+          <div class="metric-value">248</div>
+          <div class="metric-trend trend-up">▲ +34 vs last month</div>
+        </div>
+        <div class="metric-card mc-blue">
+          <div class="metric-label">Conversion Rate</div>
+          <div class="metric-value">18.5<span style="font-size:20px;font-weight:700;">%</span></div>
+          <div class="metric-trend trend-up">▲ +2.1% vs last month</div>
+        </div>
+        <div class="metric-card mc-green">
+          <div class="metric-label">Active Leads</div>
+          <div class="metric-value">171</div>
+          <div class="metric-trend trend-neutral">→ Across 5 stages</div>
+        </div>
+        <div class="metric-card mc-amber">
+          <div class="metric-label">Avg. Time to Close</div>
+          <div class="metric-value">6.2<span style="font-size:20px;font-weight:700;">d</span></div>
+          <div class="metric-trend trend-up">▲ 1.3 days faster</div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts-row">
+        <!-- DONUT -->
+        <div class="chart-card">
+          <div class="card-title">Leads by Source <span class="card-title-sub">Last 30 days</span></div>
+          <div class="donut-wrap">
+            <div class="donut">
+              <svg width="110" height="110" viewBox="0 0 110 110">
+                <!-- bg circle -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#F1F5F9" stroke-width="18"/>
+                <!-- Facebook 38% = 251.3 * 0.38 = 95.5 -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#3B82F6" stroke-width="18" stroke-dasharray="95.5 155.5" stroke-dashoffset="0"/>
+                <!-- Google 29% = 72.8 -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#EF4444" stroke-width="18" stroke-dasharray="72.8 178.2" stroke-dashoffset="-95.5"/>
+                <!-- Website 18% = 45.2 -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#10B981" stroke-width="18" stroke-dasharray="45.2 205.8" stroke-dashoffset="-168.3"/>
+                <!-- Offline 10% = 25.1 -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#94A3B8" stroke-width="18" stroke-dasharray="25.1 225.9" stroke-dashoffset="-213.5"/>
+                <!-- Twitter 5% = 12.6 -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#0EA5E9" stroke-width="18" stroke-dasharray="12.6 238.4" stroke-dashoffset="-238.6"/>
+              </svg>
+              <div class="donut-center">
+                <div class="donut-total">248</div>
+                <div class="donut-label">TOTAL</div>
+              </div>
+            </div>
+            <div class="legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div><span class="legend-name">Facebook Ads</span><span class="legend-pct">38%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div><span class="legend-name">Google Ads</span><span class="legend-pct">29%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#10B981;"></div><span class="legend-name">Website</span><span class="legend-pct">18%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#94A3B8;"></div><span class="legend-name">Offline Events</span><span class="legend-pct">10%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#0EA5E9;"></div><span class="legend-name">Twitter</span><span class="legend-pct">5%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FUNNEL -->
+        <div class="chart-card">
+          <div class="card-title">Lead Funnel <span class="card-title-sub">Stage-by-stage conversion</span></div>
+          <div class="funnel-rows">
+            <div class="funnel-row">
+              <div class="funnel-stage">New Leads</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:100%;background:#3B82F6;"><span class="funnel-num">248</span></div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-stage">Contacted</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:73%;background:#0D9488;"><span class="funnel-num">180</span></div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-stage">Interested</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:45%;background:#0F766E;"><span class="funnel-num">112</span></div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-stage">Test Drive</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:27%;background:#8B5CF6;"><span class="funnel-num">68</span></div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-stage">Negotiation</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:18.5%;background:#F59E0B;"><span class="funnel-num">46</span></div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-stage">Closed Won ✅</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:18.5%;background:#10B981;"><span class="funnel-num">46</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLES ROW -->
+      <div class="tables-row">
+        <!-- TOP SALESPEOPLE -->
+        <div class="table-card">
+          <div class="card-title">Top Salespeople <span class="card-title-sub">By conversion rate</span></div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Leads</th>
+                <th>Won</th>
+                <th>Conv. Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="rank">1</span></td>
+                <td style="font-weight:600;">Ankit Verma</td>
+                <td>42</td>
+                <td>10</td>
+                <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:95%;background:#10B981;"></div></div><span style="font-size:12px;font-weight:700;color:#10B981;">23.8%</span></div></td>
+              </tr>
+              <tr>
+                <td><span class="rank">2</span></td>
+                <td style="font-weight:600;">Deepa Rao</td>
+                <td>38</td>
+                <td>8</td>
+                <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:88%;background:#0D9488;"></div></div><span style="font-size:12px;font-weight:700;color:#0D9488;">21.1%</span></div></td>
+              </tr>
+              <tr>
+                <td><span class="rank">3</span></td>
+                <td style="font-weight:600;">Ravi Kumar</td>
+                <td>35</td>
+                <td>6</td>
+                <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:72%;background:#3B82F6;"></div></div><span style="font-size:12px;font-weight:700;color:#3B82F6;">17.1%</span></div></td>
+              </tr>
+              <tr>
+                <td><span class="rank">4</span></td>
+                <td style="font-weight:600;">Meena Sharma</td>
+                <td>30</td>
+                <td>5</td>
+                <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:66%;background:#8B5CF6;"></div></div><span style="font-size:12px;font-weight:700;color:#8B5CF6;">16.7%</span></div></td>
+              </tr>
+              <tr>
+                <td><span class="rank">5</span></td>
+                <td style="font-weight:600;">Vijay Prasad</td>
+                <td>28</td>
+                <td>4</td>
+                <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:57%;background:#F59E0B;"></div></div><span style="font-size:12px;font-weight:700;color:#F59E0B;">14.3%</span></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TOP CAR MODELS -->
+        <div class="table-card">
+          <div class="card-title">Most Demanded Car Models <span class="card-title-sub">By lead volume</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--gray);width:120px;font-weight:500;">Maruti Swift Dzire</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#0D9488;border-radius:4px;display:flex;align-items:center;padding:0 6px;justify-content:flex-end;"><span style="font-size:11px;font-weight:700;color:white;">54</span></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--gray);width:120px;font-weight:500;">Hyundai Creta</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="width:76%;height:100%;background:#3B82F6;border-radius:4px;display:flex;align-items:center;padding:0 6px;justify-content:flex-end;"><span style="font-size:11px;font-weight:700;color:white;">41</span></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--gray);width:120px;font-weight:500;">Tata Nexon</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="width:70%;height:100%;background:#8B5CF6;border-radius:4px;display:flex;align-items:center;padding:0 6px;justify-content:flex-end;"><span style="font-size:11px;font-weight:700;color:white;">38</span></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--gray);width:120px;font-weight:500;">Maruti Brezza</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="width:54%;height:100%;background:#F59E0B;border-radius:4px;display:flex;align-items:center;padding:0 6px;justify-content:flex-end;"><span style="font-size:11px;font-weight:700;color:white;">29</span></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--gray);width:120px;font-weight:500;">Honda City</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="width:41%;height:100%;background:#10B981;border-radius:4px;display:flex;align-items:center;padding:0 6px;justify-content:flex-end;"><span style="font-size:11px;font-weight:700;color:white;">22</span></div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--gray);width:120px;font-weight:500;">Tata Nexon EV</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="width:30%;height:100%;background:#0EA5E9;border-radius:4px;display:flex;align-items:center;padding:0 6px;justify-content:flex-end;"><span style="font-size:11px;font-weight:700;color:white;">16</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>

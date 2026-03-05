@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>DriveFlow CRM — Lead Listing</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #0D9488; --teal-light: #CCFBF1; --teal-dark: #0F766E;
+    --navy: #0F172A; --navy2: #1E293B; --navy3: #334155;
+    --gray: #64748B; --gray2: #94A3B8; --gray3: #CBD5E1;
+    --bg: #F8FAFC; --white: #FFFFFF;
+    --blue: #3B82F6; --blue-bg: #DBEAFE;
+    --amber: #F59E0B; --amber-bg: #FEF3C7;
+    --green: #10B981; --green-bg: #D1FAE5;
+    --purple: #8B5CF6; --purple-bg: #EDE9FE;
+    --rose: #F43F5E; --rose-bg: #FFE4E6;
+    --slate-bg: #F1F5F9;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  html, body { width: 1440px; height: 900px; overflow: hidden; background: var(--bg); font-family: var(--font); }
+
+  /* LAYOUT */
+  .app { display: flex; height: 900px; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; min-width: 220px; height: 900px;
+    background: var(--navy); display: flex; flex-direction: column;
+    padding: 0; position: relative; overflow: hidden;
+  }
+  .sidebar::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: var(--teal); opacity: 0.07;
+  }
+  .sidebar-logo {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .logo-mark { display: flex; align-items: center; gap: 9px; }
+  .logo-icon {
+    width: 32px; height: 32px; background: var(--teal);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 18px; height: 18px; fill: white; }
+  .logo-text { font-size: 15px; font-weight: 700; color: white; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 10px; color: var(--gray2); margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .nav { padding: 16px 12px; flex: 1; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--gray2); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 13.5px; font-weight: 500; color: var(--gray2);
+    transition: all 0.15s; margin-bottom: 2px;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: white; }
+  .nav-item.active { background: var(--teal); color: white; }
+  .nav-item svg { width: 16px; height: 16px; opacity: 0.8; }
+  .nav-item.active svg { opacity: 1; }
+  .nav-badge { margin-left: auto; background: var(--teal-light); color: var(--teal-dark); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
+  .nav-item.active .nav-badge { background: rgba(255,255,255,0.25); color: white; }
+
+  .sidebar-bottom { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .user-card { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+  .user-name { font-size: 13px; font-weight: 600; color: white; }
+  .user-role { font-size: 11px; color: var(--gray2); }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* TOPBAR */
+  .topbar {
+    height: 58px; background: white; border-bottom: 1px solid var(--gray3);
+    display: flex; align-items: center; padding: 0 28px; gap: 16px;
+    flex-shrink: 0;
+  }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--navy2); flex: 1; }
+  .search-wrap { position: relative; }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gray2); }
+  .search-icon svg { width: 15px; height: 15px; }
+  .search {
+    width: 280px; height: 36px; border: 1.5px solid var(--gray3); border-radius: 8px;
+    padding: 0 12px 0 36px; font-family: var(--font); font-size: 13px; color: var(--navy2);
+    background: var(--bg); outline: none;
+  }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--gray3); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray); }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .notif-wrap { position: relative; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--rose); border-radius: 50%; border: 1.5px solid white; }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 24px 28px; overflow: hidden; display: flex; flex-direction: column; gap: 16px; }
+
+  .page-header { display: flex; align-items: center; justify-content: space-between; }
+  .page-title-wrap { display: flex; align-items: center; gap: 12px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--navy2); letter-spacing: -0.5px; }
+  .count-badge { background: var(--teal-light); color: var(--teal-dark); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .btn-primary {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--teal); color: white; border: none; padding: 9px 18px;
+    border-radius: 8px; font-family: var(--font); font-size: 13.5px; font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-primary svg { width: 15px; height: 15px; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    background: white; border: 1.5px solid var(--gray3); border-radius: 10px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+  .filter-select {
+    height: 32px; border: 1.5px solid var(--gray3); border-radius: 7px;
+    padding: 0 28px 0 10px; font-family: var(--font); font-size: 12.5px; color: var(--navy2);
+    background: var(--bg); appearance: none; outline: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .filter-divider { width: 1px; height: 22px; background: var(--gray3); margin: 0 4px; }
+  .clear-btn { font-size: 12.5px; color: var(--teal); font-weight: 600; cursor: pointer; margin-left: auto; }
+
+  /* TABLE */
+  .table-wrap { flex: 1; background: white; border: 1.5px solid var(--gray3); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .table-header-row {
+    display: grid; grid-template-columns: 40px 1fr 1fr 110px 130px 140px 140px;
+    padding: 10px 16px; background: var(--bg); border-bottom: 1.5px solid var(--gray3);
+  }
+  .th { font-size: 11.5px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 4px; }
+  .th svg { width: 12px; height: 12px; opacity: 0.6; }
+
+  .table-body { flex: 1; overflow-y: auto; }
+  .table-row {
+    display: grid; grid-template-columns: 40px 1fr 1fr 110px 130px 140px 140px;
+    padding: 11px 16px; border-bottom: 1px solid var(--bg);
+    align-items: center; transition: background 0.1s;
+  }
+  .table-row:hover { background: #F0FDF4; }
+  .table-row:last-child { border-bottom: none; }
+
+  .td { font-size: 13.5px; color: var(--navy2); display: flex; align-items: center; gap: 8px; }
+  .checkbox { width: 16px; height: 16px; border: 2px solid var(--gray3); border-radius: 4px; }
+  .lead-name { font-weight: 600; }
+  .lead-email { font-size: 11.5px; color: var(--gray); }
+  .phone { font-family: var(--mono); font-size: 12.5px; }
+
+  .source-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+  .src-fb { background: #EFF6FF; color: #1D4ED8; }
+  .src-google { background: #FEF2F2; color: #DC2626; }
+  .src-web { background: #F0FDF4; color: #15803D; }
+  .src-offline { background: #F8FAFC; color: #475569; }
+  .src-twitter { background: #F0F9FF; color: #0369A1; }
+  .src-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .src-fb .src-dot { background: #3B82F6; }
+  .src-google .src-dot { background: #EF4444; }
+  .src-web .src-dot { background: #22C55E; }
+  .src-offline .src-dot { background: #94A3B8; }
+  .src-twitter .src-dot { background: #0EA5E9; }
+
+  .status-tag { display: inline-flex; align-items: center; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.2px; }
+  .s-new { background: var(--blue-bg); color: #1D4ED8; }
+  .s-contacted { background: var(--amber-bg); color: #92400E; }
+  .s-interested { background: var(--green-bg); color: #065F46; }
+  .s-testdrive { background: var(--purple-bg); color: #5B21B6; }
+  .s-negotiation { background: var(--rose-bg); color: #9F1239; }
+  .s-won { background: #DCFCE7; color: #14532D; }
+  .s-lost { background: var(--slate-bg); color: #475569; }
+
+  .assign-wrap { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--navy2); font-weight: 500; }
+  .mini-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; }
+  .a2 { background: #8B5CF6; }
+  .a3 { background: #F59E0B; }
+  .a4 { background: #3B82F6; }
+  .a5 { background: #EC4899; }
+  .a6 { background: #10B981; }
+  .a7 { background: #EF4444; }
+
+  .action-btns { display: flex; align-items: center; gap: 6px; }
+  .act-btn { width: 28px; height: 28px; border-radius: 7px; border: 1.5px solid var(--gray3); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; background: white; transition: all 0.12s; }
+  .act-btn:hover { border-color: var(--teal); background: var(--teal-light); }
+  .more-btn { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray2); }
+
+  /* PAGINATION */
+  .pagination {
+    height: 46px; border-top: 1.5px solid var(--gray3); padding: 0 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: white;
+  }
+  .page-info { font-size: 12.5px; color: var(--gray); }
+  .page-controls { display: flex; align-items: center; gap: 4px; }
+  .page-btn { width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--gray3); display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 600; cursor: pointer; color: var(--navy2); background: white; }
+  .page-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div class="logo-text">DriveFlow</div>
+          <div class="logo-sub">CRM</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Leads
+        <span class="nav-badge">248</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="8" width="5" height="13"/><rect x="17" y="5" width="5" height="16"/></svg>
+        Pipeline
+      </div>
+      <div class="nav-label">Analytics</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Reports
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Analytics
+      </div>
+      <div class="nav-label">System</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+        Settings
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="avatar">AV</div>
+        <div>
+          <div class="user-name">Ankit Verma</div>
+          <div class="user-role">Sales Executive</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">Lead Management</div>
+      <div class="search-wrap">
+        <div class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+        <input class="search" placeholder="Search leads, names, numbers…" value="">
+      </div>
+      <div class="topbar-actions">
+        <div class="icon-btn notif-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border:1.5px solid #CBD5E1;border-radius:8px;cursor:pointer;">
+          <div class="avatar" style="width:26px;height:26px;font-size:10px;">AV</div>
+          <span style="font-size:13px;font-weight:600;color:#1E293B;">Ankit V.</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <div class="page-title">All Leads</div>
+          <div class="count-badge">248 leads</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button style="display:flex;align-items:center;gap:7px;border:1.5px solid #CBD5E1;background:white;padding:8px 14px;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:600;color:#334155;cursor:pointer;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export CSV
+          </button>
+          <button class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Lead
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <span class="filter-label">Filter:</span>
+        <select class="filter-select">
+          <option>All Status</option>
+          <option>New</option>
+          <option>Contacted</option>
+          <option>Interested</option>
+        </select>
+        <select class="filter-select">
+          <option>All Sources</option>
+          <option>Facebook</option>
+          <option>Google</option>
+          <option>Website</option>
+        </select>
+        <select class="filter-select">
+          <option>All Salespeople</option>
+          <option>Ankit Verma</option>
+          <option>Deepa Rao</option>
+        </select>
+        <div class="filter-divider"></div>
+        <select class="filter-select">
+          <option>Last 30 days</option>
+          <option>Last 7 days</option>
+          <option>This month</option>
+        </select>
+        <input class="filter-select" placeholder="Car model…" style="width:130px;" />
+        <div class="clear-btn">Clear filters</div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="table-header-row">
+          <div class="th"><div class="checkbox"></div></div>
+          <div class="th">Lead <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div>
+          <div class="th">Contact</div>
+          <div class="th">Source</div>
+          <div class="th">Status</div>
+          <div class="th">Assigned To</div>
+          <div class="th">Actions</div>
+        </div>
+        <div class="table-body">
+          <!-- Row 1 -->
+          <div class="table-row">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Rahul Sharma</span>
+              <span class="lead-email">rahul@gmail.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 98441 23456</span></div>
+            <div class="td"><span class="source-badge src-fb"><span class="src-dot"></span>Facebook</span></div>
+            <div class="td"><span class="status-tag s-new">New</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar">AV</div> Ankit V.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Row 2 -->
+          <div class="table-row" style="background:#FFFBEB;">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Priya Menon</span>
+              <span class="lead-email">priya.m@yahoo.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 97234 87654</span></div>
+            <div class="td"><span class="source-badge src-google"><span class="src-dot"></span>Google</span></div>
+            <div class="td"><span class="status-tag s-contacted">Contacted</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar a2">DR</div> Deepa R.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Row 3 -->
+          <div class="table-row">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Amit Kumar</span>
+              <span class="lead-email">amitkumar@hotmail.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 96321 55678</span></div>
+            <div class="td"><span class="source-badge src-web"><span class="src-dot"></span>Website</span></div>
+            <div class="td"><span class="status-tag s-interested">Interested</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar a3">RK</div> Ravi K.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Row 4 -->
+          <div class="table-row">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Sneha Reddy</span>
+              <span class="lead-email">snehareddy@gmail.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 95111 34567</span></div>
+            <div class="td"><span class="source-badge src-offline"><span class="src-dot"></span>Offline</span></div>
+            <div class="td"><span class="status-tag s-testdrive">Test Drive</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar">AV</div> Ankit V.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Row 5 -->
+          <div class="table-row">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Vijay Patil</span>
+              <span class="lead-email">vijay.p@rediffmail.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 94567 89012</span></div>
+            <div class="td"><span class="source-badge src-twitter"><span class="src-dot"></span>Twitter</span></div>
+            <div class="td"><span class="status-tag s-negotiation">Negotiation</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar a4">MS</div> Meena S.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Row 6 -->
+          <div class="table-row">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Kavitha Nair</span>
+              <span class="lead-email">kavitha.n@gmail.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 93456 78901</span></div>
+            <div class="td"><span class="source-badge src-fb"><span class="src-dot"></span>Facebook</span></div>
+            <div class="td"><span class="status-tag s-won">Closed Won ✓</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar a2">DR</div> Deepa R.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Row 7 -->
+          <div class="table-row">
+            <div class="td"><div class="checkbox"></div></div>
+            <div class="td" style="flex-direction:column;align-items:flex-start;gap:2px;">
+              <span class="lead-name">Rohan Gupta</span>
+              <span class="lead-email">rohan.g@outlook.com</span>
+            </div>
+            <div class="td"><span class="phone">+91 92345 67890</span></div>
+            <div class="td"><span class="source-badge src-google"><span class="src-dot"></span>Google</span></div>
+            <div class="td"><span class="status-tag s-lost">Closed Lost</span></div>
+            <div class="td">
+              <div class="assign-wrap"><div class="mini-avatar a3">RK</div> Ravi K.</div>
+            </div>
+            <div class="td">
+              <div class="action-btns">
+                <div class="act-btn">📞</div>
+                <div class="act-btn">💬</div>
+                <div class="act-btn">✉️</div>
+                <div class="more-btn">⋯</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+          <div class="page-info">Showing 1–7 of 248 leads</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <select class="filter-select" style="height:28px;font-size:12px;">
+              <option>25 / page</option>
+              <option>50 / page</option>
+            </select>
+            <div class="page-controls">
+              <div class="page-btn">‹</div>
+              <div class="page-btn active">1</div>
+              <div class="page-btn">2</div>
+              <div class="page-btn">3</div>
+              <div class="page-btn">…</div>
+              <div class="page-btn">10</div>
+              <div class="page-btn">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

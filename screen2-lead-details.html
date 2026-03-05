@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>DriveFlow CRM — Lead Details</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #0D9488; --teal-light: #CCFBF1; --teal-dark: #0F766E;
+    --navy: #0F172A; --navy2: #1E293B; --navy3: #334155;
+    --gray: #64748B; --gray2: #94A3B8; --gray3: #CBD5E1;
+    --bg: #F8FAFC; --white: #FFFFFF;
+    --amber: #F59E0B; --amber-bg: #FEF3C7;
+    --green: #10B981; --green-bg: #D1FAE5;
+    --purple: #8B5CF6;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  html, body { width: 1440px; height: 900px; overflow: hidden; background: var(--bg); font-family: var(--font); }
+  .app { display: flex; height: 900px; }
+
+  /* SIDEBAR — same as screen 1 */
+  .sidebar { width: 220px; min-width: 220px; height: 900px; background: var(--navy); display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
+  .sidebar::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; border-radius: 50%; background: var(--teal); opacity: 0.07; }
+  .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .logo-mark { display: flex; align-items: center; gap: 9px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; fill: white; }
+  .logo-text { font-size: 15px; font-weight: 700; color: white; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 10px; color: var(--gray2); margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .nav { padding: 16px 12px; flex: 1; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--gray2); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13.5px; font-weight: 500; color: var(--gray2); margin-bottom: 2px; }
+  .nav-item.active { background: var(--teal); color: white; }
+  .nav-item svg { width: 16px; height: 16px; opacity: 0.8; }
+  .nav-badge { margin-left: auto; background: rgba(255,255,255,0.25); color: white; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
+  .sidebar-bottom { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .user-card { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+  .user-name { font-size: 13px; font-weight: 600; color: white; }
+  .user-role { font-size: 11px; color: var(--gray2); }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 58px; background: white; border-bottom: 1px solid var(--gray3); display: flex; align-items: center; padding: 0 28px; gap: 16px; flex-shrink: 0; }
+  .back-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--gray); cursor: pointer; }
+  .back-btn svg { width: 16px; height: 16px; }
+  .topbar-breadcrumb { font-size: 13.5px; color: var(--gray2); display: flex; align-items: center; gap: 6px; }
+  .topbar-breadcrumb .crumb-current { color: var(--navy2); font-weight: 600; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--gray3); background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray); }
+  .notif-wrap { position: relative; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: #F43F5E; border-radius: 50%; border: 1.5px solid white; }
+
+  .content { flex: 1; padding: 20px 28px; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+
+  .detail-header { display: flex; align-items: center; justify-content: space-between; }
+  .lead-identity { display: flex; align-items: center; gap: 14px; }
+  .lead-big-avatar { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--teal), #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white; }
+  .lead-big-name { font-size: 20px; font-weight: 700; color: var(--navy2); letter-spacing: -0.4px; }
+  .lead-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .status-tag { display: inline-flex; align-items: center; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+  .s-contacted { background: #FEF3C7; color: #92400E; }
+  .score-wrap { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--navy2); }
+  .star { color: var(--amber); font-size: 13px; }
+  .star.empty { color: var(--gray3); }
+  .source-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: #EFF6FF; color: #1D4ED8; }
+  .src-dot { width: 7px; height: 7px; border-radius: 50%; background: #3B82F6; }
+
+  /* QUICK ACTIONS */
+  .action-row { display: flex; gap: 10px; }
+  .action-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-family: var(--font); font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; }
+  .btn-call { background: var(--teal); color: white; }
+  .btn-whatsapp { background: #22C55E; color: white; }
+  .btn-email { background: white; color: var(--navy2); border: 1.5px solid var(--gray3) !important; }
+
+  /* TWO-COLUMN LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 16px; flex: 1; overflow: hidden; }
+
+  .left-col { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+  .right-col { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+
+  .card { background: white; border: 1.5px solid var(--gray3); border-radius: 12px; padding: 16px; }
+  .card-title { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-item label { font-size: 11px; font-weight: 600; color: var(--gray2); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .info-item value { font-size: 13.5px; font-weight: 500; color: var(--navy2); }
+
+  .car-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* INTERACTION TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .t-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bg); }
+  .t-item:last-child { border-bottom: none; }
+  .t-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+  .t-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .t-line { width: 2px; flex: 1; background: var(--gray3); margin-top: 4px; }
+  .t-body { flex: 1; }
+  .t-action { font-size: 13px; font-weight: 600; color: var(--navy2); }
+  .t-detail { font-size: 12px; color: var(--gray); margin-top: 2px; }
+  .t-time { font-size: 11px; color: var(--gray2); font-family: var(--mono); }
+
+  .dot-call { background: var(--teal-light); }
+  .dot-whatsapp { background: #DCFCE7; }
+  .dot-email { background: #EFF6FF; }
+  .dot-created { background: #F1F5F9; }
+
+  /* NOTES */
+  .notes-area { width: 100%; min-height: 70px; border: 1.5px solid var(--gray3); border-radius: 8px; padding: 10px; font-family: var(--font); font-size: 13px; color: var(--navy2); resize: none; outline: none; background: var(--bg); }
+  .save-note-btn { margin-top: 8px; background: var(--teal); color: white; border: none; padding: 7px 16px; border-radius: 7px; font-family: var(--font); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+
+  /* RIGHT COL */
+  .assign-select { width: 100%; height: 36px; border: 1.5px solid var(--gray3); border-radius: 8px; padding: 0 10px; font-family: var(--font); font-size: 13px; color: var(--navy2); background: var(--bg); outline: none; }
+  .date-input { width: 100%; height: 36px; border: 1.5px solid var(--gray3); border-radius: 8px; padding: 0 10px; font-family: var(--font); font-size: 13px; color: var(--navy2); background: var(--bg); outline: none; margin-bottom: 8px; }
+  .reminder-btn { width: 100%; background: var(--navy2); color: white; border: none; padding: 9px; border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .stage-select { width: 100%; height: 36px; border: 1.5px solid var(--gray3); border-radius: 8px; padding: 0 10px; font-family: var(--font); font-size: 13px; color: var(--navy2); background: var(--bg); outline: none; margin-bottom: 8px; }
+  .update-btn { width: 100%; background: var(--teal); color: white; border: none; padding: 9px; border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        <div><div class="logo-text">DriveFlow</div><div class="logo-sub">CRM</div></div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Main</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads<span class="nav-badge">248</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="8" width="5" height="13"/><rect x="17" y="5" width="5" height="16"/></svg>Pipeline</div>
+      <div class="nav-label">Analytics</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Reports</div>
+      <div class="nav-label">System</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="avatar">AV</div>
+        <div><div class="user-name">Ankit Verma</div><div class="user-role">Sales Executive</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="topbar">
+      <div class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Leads
+      </div>
+      <div class="topbar-breadcrumb">
+        <span>Leads</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <span class="crumb-current">Rahul Sharma</span>
+      </div>
+      <div class="topbar-right">
+        <div class="icon-btn notif-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border:1.5px solid #CBD5E1;border-radius:8px;cursor:pointer;">
+          <div class="avatar" style="width:26px;height:26px;font-size:10px;">AV</div>
+          <span style="font-size:13px;font-weight:600;color:#1E293B;">Ankit V.</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- DETAIL HEADER -->
+      <div class="detail-header">
+        <div class="lead-identity">
+          <div class="lead-big-avatar">RS</div>
+          <div>
+            <div class="lead-big-name">Rahul Sharma</div>
+            <div class="lead-meta">
+              <span class="status-tag s-contacted">Contacted</span>
+              <div class="score-wrap">
+                <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star empty">★</span>
+                <span style="color:var(--gray);font-size:12px;">Score: 7.4</span>
+              </div>
+              <span class="source-chip"><span class="src-dot"></span>Facebook Ads · Summer Drive 2022</span>
+            </div>
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="action-btn btn-call">📞 Call Now</button>
+          <button class="action-btn btn-whatsapp">💬 WhatsApp</button>
+          <button class="action-btn btn-email" style="border:1.5px solid #CBD5E1;">✉️ Send Email</button>
+        </div>
+      </div>
+
+      <!-- TWO COLUMNS -->
+      <div class="two-col">
+        <!-- LEFT -->
+        <div class="left-col">
+          <!-- CUSTOMER INFO + CAR INTEREST side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="card">
+              <div class="card-title">Customer Information</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="info-item"><label>Full Name</label><value>Rahul Sharma</value></div>
+                <div class="info-item"><label>Phone</label><value style="font-family:var(--mono);font-size:13px;">+91 98441 23456</value></div>
+                <div class="info-item"><label>Email</label><value>rahul@gmail.com</value></div>
+                <div class="info-item"><label>City</label><value>Bangalore, KA</value></div>
+                <div class="info-item"><label>Lead Captured</label><value>12 Mar 2022, 10:34 AM</value></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Car Interest</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="info-item"><label>Preferred Model</label><value style="font-weight:700;color:var(--teal);">Maruti Swift Dzire</value></div>
+                <div class="info-item"><label>Budget</label><value>₹8 – 10 Lakhs</value></div>
+                <div class="info-item"><label>Fuel Type</label><value>Petrol</value></div>
+                <div class="info-item"><label>Colour Preference</label><value>Pearl White</value></div>
+                <div class="info-item"><label>Financing</label><value>EMI preferred</value></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTION HISTORY -->
+          <div class="card" style="flex:1;">
+            <div class="card-title">Interaction History</div>
+            <div class="timeline">
+              <div class="t-item">
+                <div class="t-dot-wrap">
+                  <div class="t-dot dot-call">📞</div>
+                  <div class="t-line"></div>
+                </div>
+                <div class="t-body">
+                  <div class="t-action">Call — 3 min 42 sec</div>
+                  <div class="t-detail">"Customer is very interested in Dzire. Asked about test drive availability. Mentioned budget constraint around 9L."</div>
+                  <div class="t-time">14 Mar 2022 · 11:20 AM · Logged by Ankit V.</div>
+                </div>
+              </div>
+              <div class="t-item">
+                <div class="t-dot-wrap">
+                  <div class="t-dot dot-whatsapp">💬</div>
+                  <div class="t-line"></div>
+                </div>
+                <div class="t-body">
+                  <div class="t-action">WhatsApp Message Sent</div>
+                  <div class="t-detail">Brochure and pricing PDF shared for Dzire VXi variant.</div>
+                  <div class="t-time">13 Mar 2022 · 2:15 PM · Logged by Ankit V.</div>
+                </div>
+              </div>
+              <div class="t-item">
+                <div class="t-dot-wrap">
+                  <div class="t-dot dot-email">✉️</div>
+                  <div class="t-line"></div>
+                </div>
+                <div class="t-body">
+                  <div class="t-action">Welcome Email Sent</div>
+                  <div class="t-detail">Automated welcome email with showroom details sent on lead capture.</div>
+                  <div class="t-time">12 Mar 2022 · 10:35 AM · Auto</div>
+                </div>
+              </div>
+              <div class="t-item">
+                <div class="t-dot-wrap">
+                  <div class="t-dot dot-created">🔵</div>
+                </div>
+                <div class="t-body">
+                  <div class="t-action">Lead Created via Facebook Ads</div>
+                  <div class="t-detail">Campaign: Summer Drive 2022 · Auto-assigned to Ankit V.</div>
+                  <div class="t-time">12 Mar 2022 · 10:34 AM · System</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTES -->
+          <div class="card">
+            <div class="card-title">Notes</div>
+            <textarea class="notes-area">Customer specifically wants petrol variant. Has test driven Dzire at another dealership but found pricing steep. Good chance to close with EMI offer. Follow up after test drive with finance options.</textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+              <button class="save-note-btn">💾 Save Note</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-col">
+          <!-- ASSIGNMENT -->
+          <div class="card">
+            <div class="card-title">Assigned To</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <div class="avatar" style="width:36px;height:36px;font-size:13px;">AV</div>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--navy2);">Ankit Verma</div>
+                <div style="font-size:12px;color:var(--gray);">Sales Executive</div>
+              </div>
+            </div>
+            <select class="assign-select">
+              <option>Ankit Verma</option>
+              <option>Deepa Rao</option>
+              <option>Ravi Kumar</option>
+              <option>Meena Sharma</option>
+            </select>
+          </div>
+
+          <!-- LEAD STAGE -->
+          <div class="card">
+            <div class="card-title">Lead Stage</div>
+            <select class="stage-select">
+              <option>New Lead</option>
+              <option selected>Contacted</option>
+              <option>Interested</option>
+              <option>Test Drive Scheduled</option>
+              <option>Negotiation</option>
+              <option>Closed Won</option>
+              <option>Closed Lost</option>
+            </select>
+            <button class="update-btn">Update Stage</button>
+          </div>
+
+          <!-- FOLLOW-UP SCHEDULER -->
+          <div class="card">
+            <div class="card-title">Schedule Follow-up</div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input class="date-input" type="date" value="2022-03-17" style="flex:1;margin:0;" />
+              <input class="date-input" type="time" value="11:00" style="width:100px;margin:0;" />
+            </div>
+            <textarea class="notes-area" style="min-height:50px;margin-bottom:8px;" placeholder="Add a note for this reminder…">Confirm test drive. Bring EMI brochure.</textarea>
+            <button class="reminder-btn">⏰ Set Reminder</button>
+          </div>
+
+          <!-- UPCOMING FOLLOW-UP -->
+          <div class="card" style="background:var(--teal-light);border-color:var(--teal);">
+            <div class="card-title" style="color:var(--teal-dark);">Upcoming Follow-up</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">📅</span>
+              <div>
+                <div style="font-size:13.5px;font-weight:700;color:var(--teal-dark);">17 Mar 2022 · 11:00 AM</div>
+                <div style="font-size:12px;color:var(--teal);">Confirm test drive. Bring EMI brochure.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LEAD SCORE BREAKDOWN -->
+          <div class="card">
+            <div class="card-title">Lead Score Breakdown</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:var(--gray);">Source Quality</span>
+                <div style="display:flex;align-items:center;gap:6px;"><div style="width:80px;height:6px;background:var(--gray3);border-radius:3px;overflow:hidden;"><div style="width:80%;height:100%;background:var(--teal);border-radius:3px;"></div></div><span style="font-size:12px;font-weight:700;color:var(--navy2);">8/10</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:var(--gray);">Recency</span>
+                <div style="display:flex;align-items:center;gap:6px;"><div style="width:80px;height:6px;background:var(--gray3);border-radius:3px;overflow:hidden;"><div style="width:70%;height:100%;background:var(--teal);border-radius:3px;"></div></div><span style="font-size:12px;font-weight:700;color:var(--navy2);">7/10</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:var(--gray);">Engagement</span>
+                <div style="display:flex;align-items:center;gap:6px;"><div style="width:80px;height:6px;background:var(--gray3);border-radius:3px;overflow:hidden;"><div style="width:75%;height:100%;background:var(--amber);border-radius:3px;"></div></div><span style="font-size:12px;font-weight:700;color:var(--navy2);">7.5/10</span></div>
+              </div>
+              <div style="border-top:1px solid var(--gray3);padding-top:6px;display:flex;justify-content:space-between;">
+                <span style="font-size:13px;font-weight:700;color:var(--navy2);">Overall Score</span>
+                <span style="font-size:14px;font-weight:700;color:var(--teal);">7.4 / 10</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
